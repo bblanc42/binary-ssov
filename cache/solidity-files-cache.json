@@ -1,0 +1,259 @@
+{
+  "_format": "ethers-rs-sol-cache-2",
+  "files": {
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/ds-test/src/test.sol": {
+      "lastModificationDate": 1648786439909,
+      "contentHash": "5d45a46528eaf8a26f0a8d93669f3148",
+      "sourceName": "lib/ds-test/src/test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": ">=0.4.23",
+      "artifacts": {
+        "DSTest": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "test.sol/DSTest.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/openzeppelin-contracts/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1648929181703,
+      "contentHash": "8398972af73b4e9e5ff3b31cad86234f",
+      "sourceName": "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/utils/Context.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Ownable": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Ownable.sol/Ownable.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/openzeppelin-contracts/contracts/utils/Context.sol": {
+      "lastModificationDate": 1648929181773,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "lib/openzeppelin-contracts/contracts/utils/Context.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Context": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Context.sol/Context.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/solmate/src/tokens/ERC20.sol": {
+      "lastModificationDate": 1648929176061,
+      "contentHash": "a0b1801a2ffe030a0f4ff4d508ceb74f",
+      "sourceName": "lib/solmate/src/tokens/ERC20.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": ">=0.8.0",
+      "artifacts": {
+        "ERC20": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "ERC20.sol/ERC20.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/solmate/src/utils/SafeTransferLib.sol": {
+      "lastModificationDate": 1648929176064,
+      "contentHash": "d3463dad9847f40c3096875013f44c3f",
+      "sourceName": "lib/solmate/src/utils/SafeTransferLib.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/solmate/src/tokens/ERC20.sol"
+      ],
+      "versionRequirement": ">=0.8.0",
+      "artifacts": {
+        "SafeTransferLib": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "SafeTransferLib.sol/SafeTransferLib.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
+      "lastModificationDate": 1649421398983,
+      "contentHash": "ff654ca6ad32caf5a4912653fe59778c",
+      "sourceName": "src/Contract.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Context.sol",
+        "lib/solmate/src/tokens/ERC20.sol",
+        "lib/solmate/src/utils/SafeTransferLib.sol"
+      ],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "Contract": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Contract.sol/Contract.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
+      "lastModificationDate": 1649420985764,
+      "contentHash": "4a6d1a449026e184c927d4d08b0eb2f8",
+      "sourceName": "src/test/Contract.t.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/ds-test/src/test.sol",
+        "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Context.sol",
+        "lib/solmate/src/tokens/ERC20.sol",
+        "lib/solmate/src/utils/SafeTransferLib.sol",
+        "src/Contract.sol"
+      ],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "ContractTest": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Contract.t.sol/ContractTest.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+forge test
+
+# forge test -vvvv \
+#     --match-test testContract \
+#     --match-contract Contract

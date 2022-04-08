@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 
 // contract to create ETH binary SSOV
@@ -19,8 +19,8 @@ contract Contract is Ownable {
     event Withdraw(address indexed depositor, uint256 amount);
 
     uint256 private constant DURATION = 7 days;
-    uint256 private constant betId = 1;
-    uint256 private constant depositId = 1;
+    uint256 private betCounter = 1;
+    uint256 private depositId = 1;
     Status private status;
 
     enum Status {
@@ -40,29 +40,29 @@ contract Contract is Ownable {
     mapping(bool => uint256) isBullishToAmount;
     mapping(uint256 => address) idToDepositor;
 
-    function getAssetPrice() private returns (uint256) {
+    function getAssetPrice() private pure returns (uint256) {
         return 1;
     }
 
     function createBet() external onlyOwner {
         Bet memory bet = Bet({
-            betId: betId,
-            startTime: now,
+            betId: betCounter,
+            startTime: block.timestamp,
             assetPrice: getAssetPrice()
         });
-        bets[betId] = bet;
-        betId++;
+        bets[betCounter] = bet;
+        betCounter++;
         status = Status.EPOCH_START;
         emit BetCreated(bet);
     }
 
-    function settleEpoch(uint256 betId) onlyOwner {
+    function settleEpoch(uint256 betId) external onlyOwner {
         Bet memory bet = bets[betId];
 
-        currentTime = now;
+        uint256 currentTime = block.timestamp;
         uint256 startTime = bet.startTime;
 
-        if (startTime + DURATION < curentTime) {
+        if (startTime + DURATION < currentTime) {
             revert EpochIsOngoing();
         }
 
@@ -98,7 +98,7 @@ contract Contract is Ownable {
         status = Status.EPOCH_END;
     }
 
-    function deposit(uint256 amount, bool isBullish) external {
+    function deposit(uint256 amount, bool isBullish) external payable {
         if (status == Status.EPOCH_END) {
             revert EpochEnded();
         }
@@ -127,7 +127,7 @@ contract Contract is Ownable {
         if (amount == 0) {
             revert NothingToWithdraw();
         }
-        SafeTransferLib.safeTranserETH(payable(depositor), amount);
+        SafeTransferLib.safeTransferETH(payable(depositor), amount);
         emit Withdraw(depositor, amount);
     }
 

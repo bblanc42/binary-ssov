@@ -34,17 +34,17 @@ contract Contract is Ownable {
         uint256 assetPrice;
     }
 
-    mapping(uint256 => Bet) bets;
-    mapping(address => bool) depositorToIsBullish;
-    mapping(address => uint256) depositorToAmount;
-    mapping(bool => uint256) isBullishToAmount;
-    mapping(uint256 => address) idToDepositor;
+    mapping(uint256 => Bet) public bets;
+    mapping(address => bool) private depositorToIsBullish;
+    mapping(address => uint256) public depositorToAmount;
+    mapping(bool => uint256) private isBullishToAmount;
+    mapping(uint256 => address) private idToDepositor;
 
     function getAssetPrice() private pure returns (uint256) {
         return 1;
     }
 
-    function createBet() external onlyOwner {
+    function createBet() external onlyOwner returns (uint256) {
         Bet memory bet = Bet({
             betId: betCounter,
             startTime: block.timestamp,
@@ -54,6 +54,7 @@ contract Contract is Ownable {
         betCounter++;
         status = Status.EPOCH_START;
         emit BetCreated(bet);
+        return bet.betId;
     }
 
     function settleEpoch(uint256 betId) external onlyOwner {

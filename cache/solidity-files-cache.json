@@ -35,6 +35,82 @@
         }
       }
     },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/forge-std/src/Vm.sol": {
+      "lastModificationDate": 1648929177615,
+      "contentHash": "5e242d192cc1a77ac825a45b4c89ef29",
+      "sourceName": "lib/forge-std/src/Vm.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": ">=0.6.0",
+      "artifacts": {
+        "Vm": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Vm.sol/Vm.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/forge-std/src/stdlib.sol": {
+      "lastModificationDate": 1648929177616,
+      "contentHash": "edff4c1f9c2c81f392ec796f11688f20",
+      "sourceName": "lib/forge-std/src/stdlib.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/forge-std/src/Vm.sol"
+      ],
+      "versionRequirement": ">=0.6.0, <0.9.0",
+      "artifacts": {
+        "stdCheats": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "stdlib.sol/stdCheats.json"
+        },
+        "stdError": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "stdlib.sol/stdError.json"
+        },
+        "stdStorage": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "stdlib.sol/stdStorage.json"
+        }
+      }
+    },
     "/Users/jenshengwong/work/bblanc/binary-ssov/lib/openzeppelin-contracts/contracts/access/Ownable.sol": {
       "lastModificationDate": 1648929181703,
       "contentHash": "8398972af73b4e9e5ff3b31cad86234f",
@@ -176,8 +252,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1649421398983,
-      "contentHash": "ff654ca6ad32caf5a4912653fe59778c",
+      "lastModificationDate": 1649520261047,
+      "contentHash": "fe01b3d5027904d0e899c038824ce621",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -215,8 +291,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649420985764,
-      "contentHash": "4a6d1a449026e184c927d4d08b0eb2f8",
+      "lastModificationDate": 1649520182726,
+      "contentHash": "9e2fde65ac06c90601a70cd70781bde8",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {
@@ -242,16 +318,95 @@
       },
       "imports": [
         "lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/stdlib.sol",
         "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
         "lib/openzeppelin-contracts/contracts/utils/Context.sol",
         "lib/solmate/src/tokens/ERC20.sol",
         "lib/solmate/src/utils/SafeTransferLib.sol",
-        "src/Contract.sol"
+        "src/Contract.sol",
+        "utils/Console.sol",
+        "utils/Utilities.sol"
       ],
       "versionRequirement": "=0.8.10",
       "artifacts": {
         "ContractTest": {
           "0.8.10+commit.fc410830.Darwin.appleclang": "Contract.t.sol/ContractTest.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/utils/Console.sol": {
+      "lastModificationDate": 1649370814616,
+      "contentHash": "97140c2080ead0adf0c8d60b96942dab",
+      "sourceName": "utils/Console.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": ">=0.8.0",
+      "artifacts": {
+        "console": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Console.sol/console.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/utils/Utilities.sol": {
+      "lastModificationDate": 1649370814616,
+      "contentHash": "8f7260792f48c3338c92635a07b8b3c4",
+      "sourceName": "utils/Utilities.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/stdlib.sol"
+      ],
+      "versionRequirement": ">=0.8.0",
+      "artifacts": {
+        "IERC20": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Utilities.sol/IERC20.json"
+        },
+        "Utilities": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Utilities.sol/Utilities.json"
         }
       }
     }

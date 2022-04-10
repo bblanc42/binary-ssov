@@ -10,6 +10,8 @@ import {Contract} from "../Contract.sol";
 
 contract ContractTest is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
+    address internal constant RINKEBY_ETH_USD_ADDRESS =
+        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
     Utilities internal utils;
 
     address payable[] internal users;
@@ -36,7 +38,7 @@ contract ContractTest is DSTest {
             vm.deal(users[i], 10 ether);
         }
 
-        binarySsov = new Contract();
+        binarySsov = new Contract(RINKEBY_ETH_USD_ADDRESS);
         vm.label(address(binarySsov), "BinarySSOV");
     }
 

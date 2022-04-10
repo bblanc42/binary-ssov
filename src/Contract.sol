@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
+import "chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 
@@ -22,6 +23,7 @@ contract Contract is Ownable {
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
     Status private status;
+    AggregatorV3Interface internal priceFeed;
 
     enum Status {
         EPOCH_START,
@@ -40,8 +42,13 @@ contract Contract is Ownable {
     mapping(bool => uint256) private isBullishToAmount;
     mapping(uint256 => address) private idToDepositor;
 
-    function getAssetPrice() private pure returns (uint256) {
-        return 1;
+    constructor(address aggregatorAddress) {
+        priceFeed = AggregatorV3Interface(aggregatorAddress);
+    }
+
+    function getAssetPrice() private view returns (uint256) {
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        return uint256(price);
     }
 
     function createBet() external onlyOwner returns (uint256) {

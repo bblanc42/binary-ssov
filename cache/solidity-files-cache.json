@@ -1,6 +1,40 @@
 {
   "_format": "ethers-rs-sol-cache-2",
   "files": {
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+      "lastModificationDate": 1649521256028,
+      "contentHash": "611f626b2447ccff9ba5332460fd217f",
+      "sourceName": "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "AggregatorV3Interface": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "AggregatorV3Interface.sol/AggregatorV3Interface.json"
+        }
+      }
+    },
     "/Users/jenshengwong/work/bblanc/binary-ssov/lib/ds-test/src/test.sol": {
       "lastModificationDate": 1648786439909,
       "contentHash": "5d45a46528eaf8a26f0a8d93669f3148",
@@ -252,8 +286,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1649520261047,
-      "contentHash": "fe01b3d5027904d0e899c038824ce621",
+      "lastModificationDate": 1649524309065,
+      "contentHash": "0c5224680f4d0d306b4aff8c2f24e57e",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -278,6 +312,7 @@
         }
       },
       "imports": [
+        "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
         "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
         "lib/openzeppelin-contracts/contracts/utils/Context.sol",
         "lib/solmate/src/tokens/ERC20.sol",
@@ -290,9 +325,150 @@
         }
       }
     },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/PriceFeedAdaptor.sol": {
+      "lastModificationDate": 1649602053013,
+      "contentHash": "46f9ca5d53c3a4613ed70952648860bc",
+      "sourceName": "src/PriceFeedAdaptor.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "PriceFeedAdaptor": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "PriceFeedAdaptor.sol/PriceFeedAdaptor.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeed.sol": {
+      "lastModificationDate": 1649602011606,
+      "contentHash": "0794bc0c8ac4a92fdf07014dd774d3b6",
+      "sourceName": "src/WethPriceFeed.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "WethPriceFeed": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "WethPriceFeed.sol/WethPriceFeed.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeedAdaptor.sol": {
+      "lastModificationDate": 1649602178155,
+      "contentHash": "35fc739660140f38f668cb7ca6c211fb",
+      "sourceName": "src/WethPriceFeedAdaptor.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "src/PriceFeedAdaptor.sol",
+        "src/WethPriceFeed.sol"
+      ],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "WethPricefeedAdaptor": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "WethPriceFeedAdaptor.sol/WethPricefeedAdaptor.json"
+        }
+      }
+    },
+    "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeedSimulator.sol": {
+      "lastModificationDate": 1649602171500,
+      "contentHash": "387af4e87e0da062497d3599093928be",
+      "sourceName": "src/WethPriceFeedSimulator.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [
+        "src/WethPriceFeed.sol"
+      ],
+      "versionRequirement": "=0.8.10",
+      "artifacts": {
+        "WethPricefeedSimulator": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "WethPriceFeedSimulator.sol/WethPricefeedSimulator.json"
+        }
+      }
+    },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649520182726,
-      "contentHash": "9e2fde65ac06c90601a70cd70781bde8",
+      "lastModificationDate": 1649524280494,
+      "contentHash": "1e90ba250a983147428b33ce71c082ce",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {
@@ -317,6 +493,7 @@
         }
       },
       "imports": [
+        "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
         "lib/ds-test/src/test.sol",
         "lib/forge-std/src/Vm.sol",
         "lib/forge-std/src/stdlib.sol",

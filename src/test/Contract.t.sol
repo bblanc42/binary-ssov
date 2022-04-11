@@ -11,8 +11,7 @@ import {WethPricefeedSimulator} from "../WethPricefeedSimulator.sol";
 
 contract ContractTest is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
-    address internal constant RINKEBY_ETH_USD_ADDRESS =
-        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
+    uint256 internal WETH_START_PRICE = 3_000 * 10**18; // ETH/USD 3000.000
     Utilities internal utils;
 
     address payable[] internal users;
@@ -40,7 +39,7 @@ contract ContractTest is DSTest {
             vm.deal(users[i], 10 ether);
         }
 
-        wethPricefeedSimulator = new WethPricefeedSimulator();
+        wethPricefeedSimulator = new WethPricefeedSimulator(WETH_START_PRICE);
         binarySsov = new Contract();
         vm.label(address(binarySsov), "BinarySSOV");
     }
@@ -48,6 +47,7 @@ contract ContractTest is DSTest {
     function testCreateBet() public {
         uint256 betId = binarySsov.createBet(address(wethPricefeedSimulator));
         assertEq(betId, 1);
+        assertEq(binarySsov.getBet(1).assetPrice, WETH_START_PRICE);
     }
 
     function testNonOwnerCannotSettleOngoingEpoch() public {

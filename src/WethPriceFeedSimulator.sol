@@ -9,8 +9,8 @@ contract WethPricefeedSimulator is WethPriceFeed {
 
     event SetValue(uint256 value, bool hasValue);
 
-    constructor() {
-        value = 3_000 * 10**18; // ETH/USD 3000.000
+    constructor(uint256 _startValue) {
+        value = _startValue;
         hasValue = true;
         emit SetValue(value, hasValue);
     }

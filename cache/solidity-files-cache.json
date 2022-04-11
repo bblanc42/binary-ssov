@@ -286,8 +286,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1649647594849,
-      "contentHash": "5c73278d692ad6f23d3399f266ac08d4",
+      "lastModificationDate": 1649648104813,
+      "contentHash": "d8bf14ff66187f32e5754dbb57e0f9b5",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -432,8 +432,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeedSimulator.sol": {
-      "lastModificationDate": 1649647637621,
-      "contentHash": "12938f8ec902aab73664f49b8ef5cf01",
+      "lastModificationDate": 1649647758944,
+      "contentHash": "5180ac477862aa43870e9bd338a1e784",
       "sourceName": "src/WethPriceFeedSimulator.sol",
       "solcConfig": {
         "settings": {
@@ -468,8 +468,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649647688793,
-      "contentHash": "aa2842b0e20e491f88c28a9b3615f363",
+      "lastModificationDate": 1649648110026,
+      "contentHash": "edd8cfb2369deb17311097effd6cb692",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {

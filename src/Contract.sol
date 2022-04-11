@@ -37,7 +37,7 @@ contract Contract is Ownable {
         uint256 assetPrice;
     }
 
-    mapping(uint256 => Bet) public bets;
+    mapping(uint256 => Bet) private bets;
     mapping(address => bool) private depositorToIsBullish;
     mapping(address => uint256) public depositorToAmount;
     mapping(bool => uint256) private isBullishToAmount;
@@ -63,6 +63,11 @@ contract Contract is Ownable {
         status = Status.EPOCH_START;
         emit BetCreated(bet);
         return bet.betId;
+    }
+
+    // memory or calldata?
+    function getBet(uint256 betId) external view returns (Bet memory) {
+        return bets[betId];
     }
 
     function settleEpoch(uint256 betId, address _priceFeed) external onlyOwner {

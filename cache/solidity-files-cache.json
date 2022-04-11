@@ -286,8 +286,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1649524309065,
-      "contentHash": "0c5224680f4d0d306b4aff8c2f24e57e",
+      "lastModificationDate": 1649647594849,
+      "contentHash": "5c73278d692ad6f23d3399f266ac08d4",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -316,7 +316,8 @@
         "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
         "lib/openzeppelin-contracts/contracts/utils/Context.sol",
         "lib/solmate/src/tokens/ERC20.sol",
-        "lib/solmate/src/utils/SafeTransferLib.sol"
+        "lib/solmate/src/utils/SafeTransferLib.sol",
+        "src/WethPriceFeed.sol"
       ],
       "versionRequirement": "=0.8.10",
       "artifacts": {
@@ -360,8 +361,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeed.sol": {
-      "lastModificationDate": 1649602011606,
-      "contentHash": "0794bc0c8ac4a92fdf07014dd774d3b6",
+      "lastModificationDate": 1649647607211,
+      "contentHash": "e24df77570b4f429637a75e5a9223dc0",
       "sourceName": "src/WethPriceFeed.sol",
       "solcConfig": {
         "settings": {
@@ -394,8 +395,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeedAdaptor.sol": {
-      "lastModificationDate": 1649602178155,
-      "contentHash": "35fc739660140f38f668cb7ca6c211fb",
+      "lastModificationDate": 1649647672018,
+      "contentHash": "5aaccc406a0fc92a51ccd0081c913589",
       "sourceName": "src/WethPriceFeedAdaptor.sol",
       "solcConfig": {
         "settings": {
@@ -420,7 +421,7 @@
         }
       },
       "imports": [
-        "src/PriceFeedAdaptor.sol",
+        "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
         "src/WethPriceFeed.sol"
       ],
       "versionRequirement": "=0.8.10",
@@ -431,8 +432,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/WethPriceFeedSimulator.sol": {
-      "lastModificationDate": 1649602171500,
-      "contentHash": "387af4e87e0da062497d3599093928be",
+      "lastModificationDate": 1649647637621,
+      "contentHash": "12938f8ec902aab73664f49b8ef5cf01",
       "sourceName": "src/WethPriceFeedSimulator.sol",
       "solcConfig": {
         "settings": {
@@ -467,8 +468,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649524280494,
-      "contentHash": "1e90ba250a983147428b33ce71c082ce",
+      "lastModificationDate": 1649647688793,
+      "contentHash": "aa2842b0e20e491f88c28a9b3615f363",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {
@@ -502,6 +503,8 @@
         "lib/solmate/src/tokens/ERC20.sol",
         "lib/solmate/src/utils/SafeTransferLib.sol",
         "src/Contract.sol",
+        "src/WethPriceFeed.sol",
+        "src/WethPriceFeedSimulator.sol",
         "utils/Console.sol",
         "utils/Utilities.sol"
       ],

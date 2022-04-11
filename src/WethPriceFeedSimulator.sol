@@ -21,13 +21,7 @@ contract WethPricefeedSimulator is WethPriceFeed {
         emit SetValue(value, hasValue);
     }
 
-    function peek()
-        public
-        view
-        override
-        returns (bytes32 _value, bool _hasValue)
-    {
-        _value = bytes32(value);
-        _hasValue = hasValue;
+    function peek() public view override returns (uint256 _value) {
+        _value = uint256(value);
     }
 }

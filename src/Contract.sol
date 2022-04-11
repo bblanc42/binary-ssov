@@ -4,6 +4,7 @@ pragma solidity 0.8.10;
 import "chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
+import "./WethPriceFeed.sol";
 
 // contract to create ETH binary SSOV
 // Will the price of $ETH be > $3,500 on Friday?
@@ -23,7 +24,7 @@ contract Contract is Ownable {
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
     Status private status;
-    AggregatorV3Interface internal priceFeed;
+    // AggregatorV3Interface internal priceFeed;
 
     enum Status {
         EPOCH_START,
@@ -42,20 +43,20 @@ contract Contract is Ownable {
     mapping(bool => uint256) private isBullishToAmount;
     mapping(uint256 => address) private idToDepositor;
 
-    constructor(address aggregatorAddress) {
-        priceFeed = AggregatorV3Interface(aggregatorAddress);
+    function getAssetPrice(address _priceFeed) private view returns (uint256) {
+        uint256 price = WethPriceFeed(_priceFeed).peek();
+        return price;
     }
 
-    function getAssetPrice() private view returns (uint256) {
-        (, int256 price, , , ) = priceFeed.latestRoundData();
-        return uint256(price);
-    }
-
-    function createBet() external onlyOwner returns (uint256) {
+    function createBet(address _priceFeed)
+        external
+        onlyOwner
+        returns (uint256)
+    {
         Bet memory bet = Bet({
             betId: betCounter,
             startTime: block.timestamp,
-            assetPrice: getAssetPrice()
+            assetPrice: getAssetPrice(_priceFeed)
         });
         bets[betCounter] = bet;
         betCounter++;
@@ -64,7 +65,7 @@ contract Contract is Ownable {
         return bet.betId;
     }
 
-    function settleEpoch(uint256 betId) external onlyOwner {
+    function settleEpoch(uint256 betId, address _priceFeed) external onlyOwner {
         Bet memory bet = bets[betId];
 
         uint256 currentTime = block.timestamp;
@@ -75,7 +76,7 @@ contract Contract is Ownable {
         }
 
         uint256 previousPrice = bet.assetPrice;
-        uint256 currentPrice = getAssetPrice();
+        uint256 currentPrice = getAssetPrice(_priceFeed);
 
         uint256 bearAmount = isBullishToAmount[false];
         uint256 bullAmount = isBullishToAmount[true];

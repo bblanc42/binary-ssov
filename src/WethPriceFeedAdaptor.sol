@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
-import {PriceFeedAdaptor} from "./PriceFeedAdaptor.sol";
 import {WethPriceFeed} from "./WethPriceFeed.sol";
+import "chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-contract WethPricefeedAdaptor is PriceFeedAdaptor {
-    address public sourceAddress;
+contract WethPricefeedAdaptor is WethPriceFeed {
+    AggregatorV3Interface internal priceFeed;
 
-    constructor(address _sourceAddress) {
-        sourceAddress = _sourceAddress;
+    constructor(address _priceFeed) {
+        priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
-    function spot() external view override returns (uint256, bool) {
-        (bytes32 _value, bool hasValue) = WethPriceFeed(sourceAddress).peek();
-        return (uint256(_value), hasValue);
+    function peek() public view override returns (uint256 _value) {
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        return uint256(price);
     }
 }

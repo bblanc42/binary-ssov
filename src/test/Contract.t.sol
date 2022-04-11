@@ -7,6 +7,7 @@ import {Utilities} from "../../utils/Utilities.sol";
 import {console} from "../../utils/Console.sol";
 
 import {Contract} from "../Contract.sol";
+import {WethPricefeedSimulator} from "../WethPricefeedSimulator.sol";
 
 contract ContractTest is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -20,6 +21,7 @@ contract ContractTest is DSTest {
     address payable internal charlie;
 
     Contract internal binarySsov;
+    WethPricefeedSimulator internal wethPricefeedSimulator;
 
     function setUp() public {
         utils = new Utilities();
@@ -38,12 +40,13 @@ contract ContractTest is DSTest {
             vm.deal(users[i], 10 ether);
         }
 
-        binarySsov = new Contract(RINKEBY_ETH_USD_ADDRESS);
+        wethPricefeedSimulator = new WethPricefeedSimulator();
+        binarySsov = new Contract();
         vm.label(address(binarySsov), "BinarySSOV");
     }
 
     function testCreateBet() public {
-        uint256 betId = binarySsov.createBet();
+        uint256 betId = binarySsov.createBet(address(wethPricefeedSimulator));
         assertEq(betId, 1);
     }
 

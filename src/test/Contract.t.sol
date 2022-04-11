@@ -21,6 +21,7 @@ contract ContractTest is DSTest {
 
     Contract internal binarySsov;
     WethPricefeedSimulator internal wethPricefeedSimulator;
+    Contract.Status public status;
 
     function setUp() public {
         utils = new Utilities();
@@ -40,8 +41,9 @@ contract ContractTest is DSTest {
         }
 
         wethPricefeedSimulator = new WethPricefeedSimulator(WETH_START_PRICE);
+        vm.label(address(binarySsov), "WETH simulator");
         binarySsov = new Contract();
-        vm.label(address(binarySsov), "BinarySSOV");
+        vm.label(address(binarySsov), "Binary SSOV");
     }
 
     function testCreateBet() public {
@@ -55,7 +57,11 @@ contract ContractTest is DSTest {
     }
 
     function testCannotSettleOngoingEpoch() public {
-        assertTrue(false);
+        binarySsov.createBet(address(wethPricefeedSimulator));
+        vm.warp(5 days);
+        vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
+        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
+        assert(binarySsov.status() == Contract.Status.EPOCH_START);
     }
 
     function testSettleEndedEpoch() public {

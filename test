@@ -3,5 +3,5 @@
 # forge test
 
 forge test -vvvv \
-    --match-test testCreateBet \
+    --match-test testCannotSettleOngoingEpoch \
     --match-contract Contract

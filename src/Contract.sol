@@ -23,8 +23,7 @@ contract Contract is Ownable {
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
-    Status private status;
-    // AggregatorV3Interface internal priceFeed;
+    Status public status;
 
     enum Status {
         EPOCH_START,
@@ -76,7 +75,7 @@ contract Contract is Ownable {
         uint256 currentTime = block.timestamp;
         uint256 startTime = bet.startTime;
 
-        if (startTime + DURATION < currentTime) {
+        if (startTime + DURATION > currentTime) {
             revert EpochIsOngoing();
         }
 

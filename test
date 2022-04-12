@@ -3,7 +3,7 @@
 # forge test
 
 forge test \
-    --match-test testFailNonOwnerCannotSettleOngoingEpoch \
+    --match-test testFailNonOwnerSettleOngoingEpoch \
     --match-contract Contract
 
 forge test \
@@ -12,4 +12,12 @@ forge test \
 
 forge test \
     --match-test testSettleEndedEpoch \
+    --match-contract Contract
+
+forge test \
+    --match-test testFailDepositAfterClose \
+    --match-contract Contract
+
+forge test -vvv \
+    --match-test testDepositBull \
     --match-contract Contract

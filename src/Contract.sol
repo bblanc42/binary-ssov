@@ -25,7 +25,6 @@ contract Contract is Ownable {
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
-    Status public status;
 
     enum Status {
         EPOCH_START,
@@ -40,7 +39,7 @@ contract Contract is Ownable {
         Status status;
     }
 
-    mapping(uint256 => Bet) private bets;
+    mapping(uint256 => Bet) public bets;
     mapping(address => bool) public depositorToIsBullish;
     mapping(address => uint256) public depositorToAmount;
     mapping(bool => uint256) public isBullishToAmount;
@@ -59,11 +58,11 @@ contract Contract is Ownable {
         Bet memory bet = Bet({
             betId: betCounter,
             startTime: block.timestamp,
-            assetPrice: getAssetPrice(_priceFeed)
+            assetPrice: getAssetPrice(_priceFeed),
+            status: Status.EPOCH_START
         });
         bets[betCounter] = bet;
         betCounter++;
-        status = Status.EPOCH_START;
         emit BetCreated(bet);
         return bet.betId;
     }
@@ -74,7 +73,7 @@ contract Contract is Ownable {
     }
 
     function settleEpoch(uint256 betId, address _priceFeed) external onlyOwner {
-        Bet memory bet = bets[betId];
+        Bet storage bet = bets[betId];
 
         uint256 currentTime = block.timestamp;
         uint256 startTime = bet.startTime;
@@ -112,14 +111,14 @@ contract Contract is Ownable {
                 }
             }
         }
-        status = Status.EPOCH_END;
+        bet.status = Status.EPOCH_END;
     }
 
     function closeDeposit(uint256 betId) external onlyOwner {
-        if (status != Status.EPOCH_START) {
+        Bet storage bet = bets[betId];
+        if (bet.status != Status.EPOCH_START) {
             revert EpochMustHaveStarted();
         }
-        Bet memory bet = bets[betId];
         bet.status = Status.EPOCH_CLOSE;
         emit BetClosed(betId);
     }

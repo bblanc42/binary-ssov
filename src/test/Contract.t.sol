@@ -27,10 +27,10 @@ contract ContractTest is DSTestPlus {
     address payable internal alice;
     address payable internal bob;
     address payable internal charlie;
+    uint256 betIdOne = 1;
 
     Contract internal binarySsov;
     WethPricefeedSimulator internal wethPricefeedSimulator;
-    Contract.Status public status;
 
     function setUp() public {
         utils = new Utilities();
@@ -47,6 +47,7 @@ contract ContractTest is DSTestPlus {
         // everyone starts with 10 eth
         for (uint256 i; i < 3; i++) {
             vm.deal(users[i], 10 ether);
+            assertEq(address(users[i]).balance, 10 ether);
         }
 
         wethPricefeedSimulator = new WethPricefeedSimulator(WETH_START_PRICE);
@@ -59,33 +60,44 @@ contract ContractTest is DSTestPlus {
     function testCreateBet() public {
         uint256 betId = binarySsov.createBet(address(wethPricefeedSimulator));
         assertEq(betId, 2);
-        assertEq(binarySsov.getBet(2).assetPrice, WETH_START_PRICE);
+        (, , uint256 assetPrice, ) = binarySsov.bets(2);
+        assertEq(assetPrice, WETH_START_PRICE);
     }
 
-    function testFailNonOwnerCannotSettleOngoingEpoch() public {
+    function testFailNonOwnerSettleOngoingEpoch() public {
         vm.prank(alice);
-        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
     }
 
     function testCannotSettleOngoingEpoch() public {
         vm.warp(5 days);
         vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
-        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
-        assertEq(binarySsov.status(), Contract.Status.EPOCH_START);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
     }
 
     function testSettleEndedEpoch() public {
+        binarySsov.closeDeposit(betIdOne);
+        (, , , Contract.Status status) = binarySsov.bets(betIdOne);
+        assertEq(status, Contract.Status.EPOCH_CLOSE);
         vm.warp(7 days + 1);
-        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
-        assertEq(binarySsov.status(), Contract.Status.EPOCH_END);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
+        (, , , status) = binarySsov.bets(betIdOne);
+        assertEq(status, Contract.Status.EPOCH_END);
     }
 
-    function testCannotDepositAtEnd() public {
-        assertTrue(false);
+    function testFailDepositAfterClose() public {
+        binarySsov.closeDeposit(betIdOne);
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSignature("EpochMustHaveStarted()"));
+        binarySsov.deposit(betIdOne, 5 ether, true);
     }
 
     function testDepositBull() public {
-        assertTrue(false);
+        vm.prank(alice);
+        binarySsov.deposit(betIdOne, 5 ether, true);
+        binarySsov.closeDeposit(betIdOne);
+        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
+        assertEq(binarySsov.isBullishToAmount(false), 0);
     }
 
     function testDepositBear() public {

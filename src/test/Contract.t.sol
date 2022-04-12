@@ -9,7 +9,16 @@ import {console} from "../../utils/Console.sol";
 import {Contract} from "../Contract.sol";
 import {WethPricefeedSimulator} from "../WethPricefeedSimulator.sol";
 
-contract ContractTest is DSTest {
+contract DSTestPlus is DSTest {
+    function assertEq(Contract.Status a, Contract.Status b) internal {
+        if (a != b) {
+            emit log("Error: a == b not satisfied [Contract.Status]");
+            fail();
+        }
+    }
+}
+
+contract ContractTest is DSTestPlus {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
     uint256 internal WETH_START_PRICE = 3_000 * 10**18; // ETH/USD 3000.000
     Utilities internal utils;
@@ -44,28 +53,31 @@ contract ContractTest is DSTest {
         vm.label(address(binarySsov), "WETH simulator");
         binarySsov = new Contract();
         vm.label(address(binarySsov), "Binary SSOV");
+        binarySsov.createBet(address(wethPricefeedSimulator));
     }
 
     function testCreateBet() public {
         uint256 betId = binarySsov.createBet(address(wethPricefeedSimulator));
-        assertEq(betId, 1);
-        assertEq(binarySsov.getBet(1).assetPrice, WETH_START_PRICE);
+        assertEq(betId, 2);
+        assertEq(binarySsov.getBet(2).assetPrice, WETH_START_PRICE);
     }
 
-    function testNonOwnerCannotSettleOngoingEpoch() public {
-        assertTrue(false);
+    function testFailNonOwnerCannotSettleOngoingEpoch() public {
+        vm.prank(alice);
+        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
     }
 
     function testCannotSettleOngoingEpoch() public {
-        binarySsov.createBet(address(wethPricefeedSimulator));
         vm.warp(5 days);
         vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
         binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
-        assert(binarySsov.status() == Contract.Status.EPOCH_START);
+        assertEq(binarySsov.status(), Contract.Status.EPOCH_START);
     }
 
     function testSettleEndedEpoch() public {
-        assertTrue(false);
+        vm.warp(7 days + 1);
+        binarySsov.settleEpoch(1, address(wethPricefeedSimulator));
+        assertEq(binarySsov.status(), Contract.Status.EPOCH_END);
     }
 
     function testCannotDepositAtEnd() public {

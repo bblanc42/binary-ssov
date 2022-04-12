@@ -2,6 +2,14 @@
 
 # forge test
 
-forge test -vvvv \
+forge test \
+    --match-test testFailNonOwnerCannotSettleOngoingEpoch \
+    --match-contract Contract
+
+forge test \
     --match-test testCannotSettleOngoingEpoch \
+    --match-contract Contract
+
+forge test \
+    --match-test testSettleEndedEpoch \
     --match-contract Contract

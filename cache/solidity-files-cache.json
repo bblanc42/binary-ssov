@@ -468,8 +468,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649682100876,
-      "contentHash": "47ab87813a20f538b30ca565935ef9e8",
+      "lastModificationDate": 1649726290643,
+      "contentHash": "3cc2483bf673f5d39e0a309b97de0a5e",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {
@@ -512,6 +512,9 @@
       "artifacts": {
         "ContractTest": {
           "0.8.10+commit.fc410830.Darwin.appleclang": "Contract.t.sol/ContractTest.json"
+        },
+        "DSTestPlus": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "Contract.t.sol/DSTestPlus.json"
         }
       }
     },

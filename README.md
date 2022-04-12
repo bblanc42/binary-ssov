@@ -7,3 +7,6 @@ Will the price of $ETH be > $3,500 on Friday?
 
 ### Example 2
 WIll the price of oil be > $140 next Monday?
+
+## Considerations
+How to handle two epochs?

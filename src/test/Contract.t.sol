@@ -20,7 +20,9 @@ contract DSTestPlus is DSTest {
 
 contract ContractTest is DSTestPlus {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
-    uint256 internal WETH_START_PRICE = 3_000 * 10**18; // ETH/USD 3000.000
+    uint256 internal WETH_BEAR_PRICE = 2_000 * 10**18; // ETH/USD 2,000.000
+    uint256 internal WETH_START_PRICE = 3_000 * 10**18; // ETH/USD 3,000.000
+    uint256 internal WETH_BULL_PRICE = 4_000 * 10**18; // ETH/USD 4,000.000
     Utilities internal utils;
 
     address payable[] internal users;
@@ -89,27 +91,97 @@ contract ContractTest is DSTestPlus {
         binarySsov.closeDeposit(betIdOne);
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSignature("EpochMustHaveStarted()"));
-        binarySsov.deposit(betIdOne, 5 ether, true);
+        binarySsov.deposit(betIdOne, true);
+    }
+
+    function testFailDepositInsufficientAmount() public {
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSignature("InsufficientAmount()"));
+        binarySsov.deposit{value: 100 ether}(betIdOne, true);
     }
 
     function testDepositBull() public {
         vm.prank(alice);
-        binarySsov.deposit(betIdOne, 5 ether, true);
+        binarySsov.deposit{value: 5 ether}(betIdOne, true);
         binarySsov.closeDeposit(betIdOne);
         assertEq(binarySsov.isBullishToAmount(true), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
+        assert(binarySsov.depositorToIsBullish(address(alice)));
         assertEq(binarySsov.isBullishToAmount(false), 0);
+        assertEq(address(binarySsov).balance, 5 ether);
     }
 
     function testDepositBear() public {
-        assertTrue(false);
+        vm.prank(alice);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        binarySsov.closeDeposit(betIdOne);
+        assertEq(binarySsov.isBullishToAmount(false), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
+        assert(!binarySsov.depositorToIsBullish(address(alice)));
+        assertEq(binarySsov.isBullishToAmount(true), 0);
+        assertEq(address(binarySsov).balance, 5 ether);
     }
 
     function testWinnerWithdraw() public {
-        assertTrue(false);
+        vm.prank(alice);
+        binarySsov.deposit{value: 5 ether}(betIdOne, true);
+        vm.prank(bob);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        vm.prank(charlie);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        binarySsov.closeDeposit(betIdOne);
+        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
+        assertEq(binarySsov.isBullishToAmount(false), 10 ether);
+        assert(binarySsov.depositorToIsBullish(address(alice)));
+        assert(!binarySsov.depositorToIsBullish(address(bob)));
+        assert(!binarySsov.depositorToIsBullish(address(charlie)));
+        assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(charlie)), 5 ether);
+        assertEq(address(binarySsov).balance, 15 ether);
+        vm.warp(7 days + 1);
+        wethPricefeedSimulator.setValue(WETH_BULL_PRICE);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
+        assertEq(binarySsov.depositorToAmount(address(alice)), 15 ether);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 0 ether);
+        assertEq(binarySsov.depositorToAmount(address(charlie)), 0 ether);
+        (, , , Contract.Status status) = binarySsov.bets(betIdOne);
+        assertEq(status, Contract.Status.EPOCH_END);
+        assertEq(address(alice).balance, 5 ether);
+        vm.prank(alice);
+        binarySsov.withdraw(betIdOne);
+        assertEq(address(alice).balance, 20 ether);
     }
 
     function testLoserWithdraw() public {
-        assertTrue(false);
+        vm.prank(alice);
+        binarySsov.deposit{value: 5 ether}(betIdOne, true);
+        vm.prank(bob);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        vm.prank(charlie);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        binarySsov.closeDeposit(betIdOne);
+        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
+        assertEq(binarySsov.isBullishToAmount(false), 10 ether);
+        assert(binarySsov.depositorToIsBullish(address(alice)));
+        assert(!binarySsov.depositorToIsBullish(address(bob)));
+        assert(!binarySsov.depositorToIsBullish(address(charlie)));
+        assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(charlie)), 5 ether);
+        assertEq(address(binarySsov).balance, 15 ether);
+        vm.warp(7 days + 1);
+        wethPricefeedSimulator.setValue(WETH_BEAR_PRICE);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
+        assertEq(binarySsov.depositorToAmount(address(alice)), 0);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 7.5 ether);
+        assertEq(binarySsov.depositorToAmount(address(charlie)), 7.5 ether);
+        (, , , Contract.Status status) = binarySsov.bets(betIdOne);
+        assertEq(status, Contract.Status.EPOCH_END);
+        assertEq(address(bob).balance, 5 ether);
+        vm.prank(bob);
+        binarySsov.withdraw(betIdOne);
+        assertEq(address(bob).balance, 12.5 ether);
     }
 
     function testCannotWithdraw() public {

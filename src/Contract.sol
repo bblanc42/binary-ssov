@@ -5,6 +5,7 @@ import "chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "./WethPriceFeed.sol";
+import {console} from "../utils/Console.sol";
 
 // contract to create ETH binary SSOV
 // Will the price of $ETH be > $3,500 on Friday?
@@ -25,6 +26,7 @@ contract Contract is Ownable {
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
+    uint256 private constant MULT_MULTIPLIER = 1_000;
 
     enum Status {
         EPOCH_START,
@@ -67,11 +69,6 @@ contract Contract is Ownable {
         return bet.betId;
     }
 
-    // memory or calldata?
-    function getBet(uint256 betId) external view returns (Bet memory) {
-        return bets[betId];
-    }
-
     function settleEpoch(uint256 betId, address _priceFeed) external onlyOwner {
         Bet storage bet = bets[betId];
 
@@ -85,29 +82,34 @@ contract Contract is Ownable {
         uint256 previousPrice = bet.assetPrice;
         uint256 currentPrice = getAssetPrice(_priceFeed);
 
-        uint256 bearAmount = isBullishToAmount[false];
         uint256 bullAmount = isBullishToAmount[true];
+        uint256 bearAmount = isBullishToAmount[false];
 
         if (currentPrice >= previousPrice) {
-            for (uint256 i = 0; i < depositId; ++i) {
+            for (uint256 i = 1; i < depositId; ++i) {
                 address depositor = idToDepositor[i];
                 if (!depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
                 } else {
-                    uint256 previousShare = depositorToAmount[depositor] /
-                        bullAmount;
-                    depositorToAmount[depositor] += previousShare * bearAmount;
+                    uint256 previousShare = (depositorToAmount[depositor] *
+                        MULT_MULTIPLIER) / bullAmount;
+                    depositorToAmount[depositor] +=
+                        (previousShare * bearAmount) /
+                        MULT_MULTIPLIER;
                 }
             }
         } else {
-            for (uint256 i = 0; i < depositId; ++i) {
+            for (uint256 i = 1; i < depositId; ++i) {
                 address depositor = idToDepositor[i];
+                // bullish depositor's balance -> 0
                 if (depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
                 } else {
-                    uint256 previousShare = depositorToAmount[depositor] /
-                        bearAmount;
-                    depositorToAmount[depositor] += previousShare * bearAmount;
+                    uint256 previousShare = (depositorToAmount[depositor] *
+                        MULT_MULTIPLIER) / bearAmount;
+                    depositorToAmount[depositor] +=
+                        (previousShare * bullAmount) /
+                        MULT_MULTIPLIER;
                 }
             }
         }
@@ -123,16 +125,13 @@ contract Contract is Ownable {
         emit BetClosed(betId);
     }
 
-    function deposit(
-        uint256 betId,
-        uint256 amount,
-        bool isBullish
-    ) external payable {
+    function deposit(uint256 betId, bool isBullish) external payable {
         if (bets[betId].status == Status.EPOCH_CLOSE) {
             revert EpochClosed();
         }
         address depositor = msg.sender;
-        if (msg.value < amount) {
+        uint256 amount = msg.value;
+        if (amount < address(depositor).balance) {
             revert InsufficientAmount();
         }
         depositorToIsBullish[depositor] = isBullish;

@@ -2,22 +2,38 @@
 
 # forge test
 
-forge test \
-    --match-test testFailNonOwnerSettleOngoingEpoch \
-    --match-contract Contract
+# forge test \
+#     --match-test testFailNonOwnerSettleOngoingEpoch \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testCannotSettleOngoingEpoch \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testSettleEndedEpoch \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testFailDepositAfterClose \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testFailDepositInsufficientAmount \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testDepositBull \
+#     --match-contract Contract
+
+# forge test \
+#     --match-test testDepositBear \
+#     --match-contract Contract
 
 forge test \
-    --match-test testCannotSettleOngoingEpoch \
+    --match-test testWinnerWithdraw \
     --match-contract Contract
 
-forge test \
-    --match-test testSettleEndedEpoch \
-    --match-contract Contract
-
-forge test \
-    --match-test testFailDepositAfterClose \
-    --match-contract Contract
-
-forge test -vvv \
-    --match-test testDepositBull \
+forge test -vv \
+    --match-test testLoserWithdraw \
     --match-contract Contract

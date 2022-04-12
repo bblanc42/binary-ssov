@@ -30,10 +30,14 @@
 #     --match-test testDepositBear \
 #     --match-contract Contract
 
-forge test \
-    --match-test testWinnerWithdraw \
-    --match-contract Contract
+# forge test \
+#     --match-test testWinnerWithdraw \
+#     --match-contract Contract
+
+# forge test -vv \
+#     --match-test testLoserWithdraw \
+#     --match-contract Contract
 
 forge test -vv \
-    --match-test testLoserWithdraw \
+    --match-test testCannotWithdraw \
     --match-contract Contract

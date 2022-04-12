@@ -469,8 +469,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1649734103969,
-      "contentHash": "118c62114fa2c789d6d8865ad4839cf5",
+      "lastModificationDate": 1649766227546,
+      "contentHash": "dafaea60b992a338eccb04e0703a4a8f",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {

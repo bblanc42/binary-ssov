@@ -122,7 +122,7 @@ contract ContractTest is DSTestPlus {
         assertEq(address(binarySsov).balance, 5 ether);
     }
 
-    function testWinnerWithdraw() public {
+    function testWithdrawSetup() public {
         vm.prank(alice);
         binarySsov.deposit{value: 5 ether}(betIdOne, true);
         vm.prank(bob);
@@ -140,6 +140,10 @@ contract ContractTest is DSTestPlus {
         assertEq(binarySsov.depositorToAmount(address(charlie)), 5 ether);
         assertEq(address(binarySsov).balance, 15 ether);
         vm.warp(7 days + 1);
+    }
+
+    function testWinnerWithdraw() public {
+        testWithdrawSetup();
         wethPricefeedSimulator.setValue(WETH_BULL_PRICE);
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
         assertEq(binarySsov.depositorToAmount(address(alice)), 15 ether);
@@ -154,23 +158,7 @@ contract ContractTest is DSTestPlus {
     }
 
     function testLoserWithdraw() public {
-        vm.prank(alice);
-        binarySsov.deposit{value: 5 ether}(betIdOne, true);
-        vm.prank(bob);
-        binarySsov.deposit{value: 5 ether}(betIdOne, false);
-        vm.prank(charlie);
-        binarySsov.deposit{value: 5 ether}(betIdOne, false);
-        binarySsov.closeDeposit(betIdOne);
-        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
-        assertEq(binarySsov.isBullishToAmount(false), 10 ether);
-        assert(binarySsov.depositorToIsBullish(address(alice)));
-        assert(!binarySsov.depositorToIsBullish(address(bob)));
-        assert(!binarySsov.depositorToIsBullish(address(charlie)));
-        assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
-        assertEq(binarySsov.depositorToAmount(address(bob)), 5 ether);
-        assertEq(binarySsov.depositorToAmount(address(charlie)), 5 ether);
-        assertEq(address(binarySsov).balance, 15 ether);
-        vm.warp(7 days + 1);
+        testWithdrawSetup();
         wethPricefeedSimulator.setValue(WETH_BEAR_PRICE);
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
         assertEq(binarySsov.depositorToAmount(address(alice)), 0);
@@ -185,7 +173,18 @@ contract ContractTest is DSTestPlus {
     }
 
     function testCannotWithdraw() public {
-        assertTrue(false);
+        vm.prank(alice);
+        binarySsov.deposit{value: 5 ether}(betIdOne, true);
+        vm.prank(bob);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        vm.prank(charlie);
+        binarySsov.deposit{value: 5 ether}(betIdOne, false);
+        binarySsov.closeDeposit(betIdOne);
+        assertEq(address(alice).balance, 5 ether);
+        vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
+        vm.prank(alice);
+        binarySsov.withdraw(betIdOne);
+        assertEq(address(alice).balance, 5 ether);
     }
 
     function testContract() public {

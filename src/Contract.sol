@@ -9,15 +9,17 @@ import "./WethPriceFeed.sol";
 // contract to create ETH binary SSOV
 // Will the price of $ETH be > $3,500 on Friday?
 contract Contract is Ownable {
-    error EpochEnded();
+    error EpochClosed();
     error EpochIsOngoing();
+    error EpochMustHaveStarted();
     error FailToDeposit();
     error InsufficientAmount();
     error Unauthorized();
     error NothingToWithdraw();
 
     event BetCreated(Bet bet);
-    event Deposited(address indexed depositor, uint256 amount, bool isBullish);
+    event BetClosed(uint256 betId);
+    event Deposit(address indexed depositor, uint256 amount, bool isBullish);
     event Withdraw(address indexed depositor, uint256 amount);
 
     uint256 private constant DURATION = 7 days;
@@ -27,6 +29,7 @@ contract Contract is Ownable {
 
     enum Status {
         EPOCH_START,
+        EPOCH_CLOSE,
         EPOCH_END
     }
 
@@ -34,13 +37,14 @@ contract Contract is Ownable {
         uint256 betId;
         uint256 startTime;
         uint256 assetPrice;
+        Status status;
     }
 
     mapping(uint256 => Bet) private bets;
-    mapping(address => bool) private depositorToIsBullish;
+    mapping(address => bool) public depositorToIsBullish;
     mapping(address => uint256) public depositorToAmount;
-    mapping(bool => uint256) private isBullishToAmount;
-    mapping(uint256 => address) private idToDepositor;
+    mapping(bool => uint256) public isBullishToAmount;
+    mapping(uint256 => address) public idToDepositor;
 
     function getAssetPrice(address _priceFeed) private view returns (uint256) {
         uint256 price = WethPriceFeed(_priceFeed).peek();
@@ -111,9 +115,22 @@ contract Contract is Ownable {
         status = Status.EPOCH_END;
     }
 
-    function deposit(uint256 amount, bool isBullish) external payable {
-        if (status == Status.EPOCH_END) {
-            revert EpochEnded();
+    function closeDeposit(uint256 betId) external onlyOwner {
+        if (status != Status.EPOCH_START) {
+            revert EpochMustHaveStarted();
+        }
+        Bet memory bet = bets[betId];
+        bet.status = Status.EPOCH_CLOSE;
+        emit BetClosed(betId);
+    }
+
+    function deposit(
+        uint256 betId,
+        uint256 amount,
+        bool isBullish
+    ) external payable {
+        if (bets[betId].status == Status.EPOCH_CLOSE) {
+            revert EpochClosed();
         }
         address depositor = msg.sender;
         if (msg.value < amount) {
@@ -128,11 +145,11 @@ contract Contract is Ownable {
         if (!success) {
             revert FailToDeposit();
         }
-        emit Deposited(depositor, amount, isBullish);
+        emit Deposit(depositor, amount, isBullish);
     }
 
-    function withdraw() external {
-        if (status != Status.EPOCH_END) {
+    function withdraw(uint256 betId) external {
+        if (bets[betId].status != Status.EPOCH_END) {
             revert EpochIsOngoing();
         }
         address depositor = msg.sender;

@@ -5,20 +5,17 @@ import {WethPriceFeed} from "./WethPriceFeed.sol";
 
 contract WethPricefeedSimulator is WethPriceFeed {
     uint256 public value;
-    bool public hasValue;
 
-    event SetValue(uint256 value, bool hasValue);
+    event SetValue(uint256 value);
 
     constructor(uint256 _startValue) {
         value = _startValue;
-        hasValue = true;
-        emit SetValue(value, hasValue);
+        emit SetValue(value);
     }
 
-    function setValue(uint256 _value, bool _hasValue) public {
+    function setValue(uint256 _value) public {
         value = _value;
-        hasValue = _hasValue;
-        emit SetValue(value, hasValue);
+        emit SetValue(value);
     }
 
     function peek() public view override returns (uint256 _value) {

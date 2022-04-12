@@ -23,6 +23,7 @@ contract ContractTest is DSTestPlus {
     uint256 internal WETH_BEAR_PRICE = 2_000 * 10**18; // ETH/USD 2,000.000
     uint256 internal WETH_START_PRICE = 3_000 * 10**18; // ETH/USD 3,000.000
     uint256 internal WETH_BULL_PRICE = 4_000 * 10**18; // ETH/USD 4,000.000
+    uint256 internal WETH_BULLER_PRICE = 5_000 * 10**18; // ETH/USD 5,000.000
     Utilities internal utils;
 
     address payable[] internal users;
@@ -192,22 +193,12 @@ contract ContractTest is DSTestPlus {
         assertEq(address(alice).balance, 5 ether);
     }
 
-    function testRolloverBet() public {
+    function testRolloverBearsWin() public {
         testWithdrawSetup();
 
         // bulls (alice) win on first epoch and
         wethPricefeedSimulator.setValue(WETH_BULL_PRICE);
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
-
-        // alice has a balance of 15 $weth but does not withdraw
-        assertEq(binarySsov.depositorToAmount(address(alice)), 15 ether);
-        assertEq(binarySsov.depositorToAmount(address(bob)), 0 ether);
-        assertEq(binarySsov.depositorToAmount(address(cathy)), 0 ether);
-
-        // check contract balance
-        assertEq(address(binarySsov).balance, 15 ether);
-        assertEq(binarySsov.isBullishToAmount(true), 0);
-        assertEq(binarySsov.isBullishToAmount(false), 0);
 
         // new epoch, new bet
         uint256 betIdTwo = binarySsov.createBet(
@@ -252,7 +243,37 @@ contract ContractTest is DSTestPlus {
         assertEq(status, Contract.Status.EPOCH_END);
     }
 
-    function testContract() public {
-        assertTrue(false);
+    function testRolloverBullsWin() public {
+        testWithdrawSetup();
+
+        // bulls (alice) win on first epoch and
+        wethPricefeedSimulator.setValue(WETH_BULL_PRICE);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
+
+        // new epoch, new bet
+        uint256 betIdTwo = binarySsov.createBet(
+            address(wethPricefeedSimulator)
+        );
+
+        // bears (bob and david) deposit 3 and 4 $weth into bear
+        vm.prank(bob);
+        binarySsov.deposit{value: 3 ether}(betIdTwo, false);
+        vm.prank(david);
+        binarySsov.deposit{value: 4 ether}(betIdTwo, false);
+        binarySsov.closeDeposit(betIdTwo);
+
+        // fast forward one week after epoch 1 ends
+        vm.warp(14 days + 2);
+
+        // bulls win again on second epoch
+        wethPricefeedSimulator.setValue(WETH_BULLER_PRICE);
+        binarySsov.settleEpoch(betIdTwo, address(wethPricefeedSimulator));
+
+        assertEq(binarySsov.depositorToAmount(address(alice)), 22 ether);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 0);
+        assertEq(binarySsov.depositorToAmount(address(david)), 0);
+
+        (, , , Contract.Status status) = binarySsov.bets(betIdTwo);
+        assertEq(status, Contract.Status.EPOCH_END);
     }
 }

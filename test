@@ -39,5 +39,5 @@ forge test -vv
 #     --match-contract Contract
 
 # forge test -vv \
-#     --match-test testRolloverBet \
+#     --match-test testRolloverBullsWin \
 #     --match-contract Contract

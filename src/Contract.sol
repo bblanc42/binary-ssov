@@ -22,6 +22,7 @@ contract Contract is Ownable {
     event BetClosed(uint256 betId);
     event Deposit(address indexed depositor, uint256 amount, bool isBullish);
     event Withdraw(address indexed depositor, uint256 amount);
+    event EpochSettle();
 
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
@@ -43,6 +44,7 @@ contract Contract is Ownable {
 
     mapping(uint256 => Bet) public bets;
     mapping(address => bool) public depositorToIsBullish;
+    mapping(address => bool) public depositors;
     mapping(address => uint256) public depositorToAmount;
     mapping(bool => uint256) public isBullishToAmount;
     mapping(uint256 => address) public idToDepositor;
@@ -50,6 +52,16 @@ contract Contract is Ownable {
     function getAssetPrice(address _priceFeed) private view returns (uint256) {
         uint256 price = WethPriceFeed(_priceFeed).peek();
         return price;
+    }
+
+    function rollover() private {
+        for (uint256 i = 1; i < depositId; ++i) {
+            address depositor = idToDepositor[i];
+            uint256 amount = depositorToAmount[depositor];
+            if (amount != 0) {
+                isBullishToAmount[depositorToIsBullish[depositor]] += amount;
+            }
+        }
     }
 
     function createBet(address _priceFeed)
@@ -65,6 +77,7 @@ contract Contract is Ownable {
         });
         bets[betCounter] = bet;
         betCounter++;
+        rollover();
         emit BetCreated(bet);
         return bet.betId;
     }
@@ -88,11 +101,16 @@ contract Contract is Ownable {
         if (currentPrice >= previousPrice) {
             for (uint256 i = 1; i < depositId; ++i) {
                 address depositor = idToDepositor[i];
+                uint256 amount = depositorToAmount[depositor];
+                if (amount == 0) {
+                    continue;
+                }
+
                 if (!depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
                 } else {
-                    uint256 previousShare = (depositorToAmount[depositor] *
-                        MULT_MULTIPLIER) / bullAmount;
+                    uint256 previousShare = (amount * MULT_MULTIPLIER) /
+                        bullAmount;
                     depositorToAmount[depositor] +=
                         (previousShare * bearAmount) /
                         MULT_MULTIPLIER;
@@ -101,6 +119,11 @@ contract Contract is Ownable {
         } else {
             for (uint256 i = 1; i < depositId; ++i) {
                 address depositor = idToDepositor[i];
+                uint256 amount = depositorToAmount[depositor];
+                if (amount == 0) {
+                    continue;
+                }
+
                 // bullish depositor's balance -> 0
                 if (depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
@@ -113,7 +136,10 @@ contract Contract is Ownable {
                 }
             }
         }
+        isBullishToAmount[false] = 0;
+        isBullishToAmount[true] = 0;
         bet.status = Status.EPOCH_END;
+        emit EpochSettle();
     }
 
     function closeDeposit(uint256 betId) external onlyOwner {
@@ -129,20 +155,27 @@ contract Contract is Ownable {
         if (bets[betId].status == Status.EPOCH_CLOSE) {
             revert EpochClosed();
         }
+
         address depositor = msg.sender;
         uint256 amount = msg.value;
-        if (amount < address(depositor).balance) {
-            revert InsufficientAmount();
-        }
+
         depositorToIsBullish[depositor] = isBullish;
         depositorToAmount[depositor] += amount;
         isBullishToAmount[isBullish] += amount;
-        idToDepositor[depositId] = depositor;
-        depositId++;
+
+        // add new depositor to `depositors`
+        if (!depositors[depositor]) {
+            depositors[depositor] = true;
+            idToDepositor[depositId] = depositor;
+            depositId++;
+        }
+
         (bool success, ) = payable(address(this)).call{value: amount}("");
+
         if (!success) {
             revert FailToDeposit();
         }
+
         emit Deposit(depositor, amount, isBullish);
     }
 
@@ -150,11 +183,17 @@ contract Contract is Ownable {
         if (bets[betId].status != Status.EPOCH_END) {
             revert EpochIsOngoing();
         }
+
         address depositor = msg.sender;
         uint256 amount = depositorToAmount[depositor];
+
         if (amount == 0) {
             revert NothingToWithdraw();
         }
+
+        depositorToAmount[depositor] = 0;
+        isBullishToAmount[depositorToIsBullish[depositor]] = 0;
+
         SafeTransferLib.safeTransferETH(payable(depositor), amount);
         emit Withdraw(depositor, amount);
     }

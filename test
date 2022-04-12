@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# forge test
+forge test -vv
 
 # forge test \
 #     --match-test testFailNonOwnerSettleOngoingEpoch \
@@ -34,10 +34,10 @@
 #     --match-test testWinnerWithdraw \
 #     --match-contract Contract
 
-# forge test -vv \
+# forge test -vvv \
 #     --match-test testLoserWithdraw \
 #     --match-contract Contract
 
-forge test -vv \
-    --match-test testCannotWithdraw \
-    --match-contract Contract
+# forge test -vv \
+#     --match-test testRolloverBet \
+#     --match-contract Contract

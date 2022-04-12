@@ -28,7 +28,8 @@ contract ContractTest is DSTestPlus {
     address payable[] internal users;
     address payable internal alice;
     address payable internal bob;
-    address payable internal charlie;
+    address payable internal cathy;
+    address payable internal david;
     uint256 betIdOne = 1;
 
     Contract internal binarySsov;
@@ -36,18 +37,20 @@ contract ContractTest is DSTestPlus {
 
     function setUp() public {
         utils = new Utilities();
-        users = utils.createUsers(3);
+        users = utils.createUsers(4);
 
         alice = users[0];
         bob = users[1];
-        charlie = users[2];
+        cathy = users[2];
+        david = users[3];
 
         vm.label(alice, "Alice");
         vm.label(bob, "Bob");
-        vm.label(charlie, "Charlie");
+        vm.label(cathy, "Cathy");
+        vm.label(david, "David");
 
         // everyone starts with 10 eth
-        for (uint256 i; i < 3; i++) {
+        for (uint256 i; i < 4; i++) {
             vm.deal(users[i], 10 ether);
             assertEq(address(users[i]).balance, 10 ether);
         }
@@ -127,17 +130,17 @@ contract ContractTest is DSTestPlus {
         binarySsov.deposit{value: 5 ether}(betIdOne, true);
         vm.prank(bob);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
-        vm.prank(charlie);
+        vm.prank(cathy);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
         binarySsov.closeDeposit(betIdOne);
         assertEq(binarySsov.isBullishToAmount(true), 5 ether);
         assertEq(binarySsov.isBullishToAmount(false), 10 ether);
         assert(binarySsov.depositorToIsBullish(address(alice)));
         assert(!binarySsov.depositorToIsBullish(address(bob)));
-        assert(!binarySsov.depositorToIsBullish(address(charlie)));
+        assert(!binarySsov.depositorToIsBullish(address(cathy)));
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(bob)), 5 ether);
-        assertEq(binarySsov.depositorToAmount(address(charlie)), 5 ether);
+        assertEq(binarySsov.depositorToAmount(address(cathy)), 5 ether);
         assertEq(address(binarySsov).balance, 15 ether);
         vm.warp(7 days + 1);
     }
@@ -148,13 +151,14 @@ contract ContractTest is DSTestPlus {
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
         assertEq(binarySsov.depositorToAmount(address(alice)), 15 ether);
         assertEq(binarySsov.depositorToAmount(address(bob)), 0 ether);
-        assertEq(binarySsov.depositorToAmount(address(charlie)), 0 ether);
+        assertEq(binarySsov.depositorToAmount(address(cathy)), 0 ether);
         (, , , Contract.Status status) = binarySsov.bets(betIdOne);
         assertEq(status, Contract.Status.EPOCH_END);
         assertEq(address(alice).balance, 5 ether);
         vm.prank(alice);
         binarySsov.withdraw(betIdOne);
         assertEq(address(alice).balance, 20 ether);
+        assertEq(address(binarySsov).balance, 0 ether);
     }
 
     function testLoserWithdraw() public {
@@ -163,13 +167,14 @@ contract ContractTest is DSTestPlus {
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
         assertEq(binarySsov.depositorToAmount(address(alice)), 0);
         assertEq(binarySsov.depositorToAmount(address(bob)), 7.5 ether);
-        assertEq(binarySsov.depositorToAmount(address(charlie)), 7.5 ether);
+        assertEq(binarySsov.depositorToAmount(address(cathy)), 7.5 ether);
         (, , , Contract.Status status) = binarySsov.bets(betIdOne);
         assertEq(status, Contract.Status.EPOCH_END);
         assertEq(address(bob).balance, 5 ether);
         vm.prank(bob);
         binarySsov.withdraw(betIdOne);
         assertEq(address(bob).balance, 12.5 ether);
+        assertEq(address(binarySsov).balance, 7.5 ether);
     }
 
     function testCannotWithdraw() public {
@@ -177,7 +182,7 @@ contract ContractTest is DSTestPlus {
         binarySsov.deposit{value: 5 ether}(betIdOne, true);
         vm.prank(bob);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
-        vm.prank(charlie);
+        vm.prank(cathy);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
         binarySsov.closeDeposit(betIdOne);
         assertEq(address(alice).balance, 5 ether);
@@ -185,6 +190,66 @@ contract ContractTest is DSTestPlus {
         vm.prank(alice);
         binarySsov.withdraw(betIdOne);
         assertEq(address(alice).balance, 5 ether);
+    }
+
+    function testRolloverBet() public {
+        testWithdrawSetup();
+
+        // bulls (alice) win on first epoch and
+        wethPricefeedSimulator.setValue(WETH_BULL_PRICE);
+        binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
+
+        // alice has a balance of 15 $weth but does not withdraw
+        assertEq(binarySsov.depositorToAmount(address(alice)), 15 ether);
+        assertEq(binarySsov.depositorToAmount(address(bob)), 0 ether);
+        assertEq(binarySsov.depositorToAmount(address(cathy)), 0 ether);
+
+        // check contract balance
+        assertEq(address(binarySsov).balance, 15 ether);
+        assertEq(binarySsov.isBullishToAmount(true), 0);
+        assertEq(binarySsov.isBullishToAmount(false), 0);
+
+        // new epoch, new bet
+        uint256 betIdTwo = binarySsov.createBet(
+            address(wethPricefeedSimulator)
+        );
+        (, , uint256 price, ) = binarySsov.bets(betIdTwo);
+        assertEq(price, WETH_BULL_PRICE);
+
+        assertEq(binarySsov.isBullishToAmount(true), 15 ether);
+        assertEq(binarySsov.isBullishToAmount(false), 0);
+
+        // bears (bob and david) deposit 3 and 4 $weth into bear
+        vm.prank(bob);
+        binarySsov.deposit{value: 3 ether}(betIdTwo, false);
+        vm.prank(david);
+        binarySsov.deposit{value: 4 ether}(betIdTwo, false);
+        binarySsov.closeDeposit(betIdTwo);
+
+        // check contract balance
+        assertEq(address(binarySsov).balance, 22 ether);
+        assertEq(binarySsov.isBullishToAmount(true), 15 ether);
+        assertEq(binarySsov.isBullishToAmount(false), 7 ether);
+
+        // fast forward one week after epoch 1 ends
+        vm.warp(14 days + 2);
+
+        // bears win on second epoch
+        wethPricefeedSimulator.setValue(WETH_BEAR_PRICE);
+        binarySsov.settleEpoch(betIdTwo, address(wethPricefeedSimulator));
+
+        assertEq(binarySsov.depositorToAmount(address(alice)), 0);
+
+        // bob: 3/7 * 15 ~= 6.42 + 3
+        assertGt(binarySsov.depositorToAmount(address(bob)), 9.4 ether);
+        assertLt(binarySsov.depositorToAmount(address(bob)), 9.5 ether);
+
+        // david: 4/7 * 15 ~= 8.57 + 4
+        assertGt(binarySsov.depositorToAmount(address(david)), 12.5 ether);
+        assertLt(binarySsov.depositorToAmount(address(david)), 12.6 ether);
+
+        (, , , Contract.Status status) = binarySsov.bets(betIdTwo);
+        assertEq(status, Contract.Status.EPOCH_END);
     }
 
     function testContract() public {

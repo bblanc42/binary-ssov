@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "./WethPriceFeed.sol";
-import {console} from "../utils/Console.sol";
 
 // contract to create ETH binary SSOV
 // Will the price of $ETH be > $3,500 on Friday?
@@ -27,7 +27,6 @@ contract Contract is Ownable {
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
-    uint256 private constant MULT_MULTIPLIER = 1_000;
 
     enum Status {
         EPOCH_START,
@@ -109,11 +108,14 @@ contract Contract is Ownable {
                 if (!depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
                 } else {
-                    uint256 previousShare = (amount * MULT_MULTIPLIER) /
-                        bullAmount;
-                    depositorToAmount[depositor] +=
-                        (previousShare * bearAmount) /
-                        MULT_MULTIPLIER;
+                    int128 previousShare = ABDKMath64x64.divu(
+                        amount,
+                        bullAmount
+                    );
+                    depositorToAmount[depositor] += ABDKMath64x64.mulu(
+                        previousShare,
+                        bearAmount
+                    );
                 }
             }
         } else {
@@ -128,11 +130,14 @@ contract Contract is Ownable {
                 if (depositorToIsBullish[depositor]) {
                     depositorToAmount[depositor] = 0;
                 } else {
-                    uint256 previousShare = (depositorToAmount[depositor] *
-                        MULT_MULTIPLIER) / bearAmount;
-                    depositorToAmount[depositor] +=
-                        (previousShare * bullAmount) /
-                        MULT_MULTIPLIER;
+                    int128 previousShare = ABDKMath64x64.divu(
+                        amount,
+                        bearAmount
+                    );
+                    depositorToAmount[depositor] += ABDKMath64x64.mulu(
+                        previousShare,
+                        bullAmount
+                    );
                 }
             }
         }

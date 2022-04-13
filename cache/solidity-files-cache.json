@@ -1,6 +1,40 @@
 {
   "_format": "ethers-rs-sol-cache-2",
   "files": {
+    "/Users/jenshengwong/work/bblanc/binary-ssov/lib/abdk-libraries-solidity/ABDKMath64x64.sol": {
+      "lastModificationDate": 1649890154449,
+      "contentHash": "2ca845338c023b28b45b709e81f337af",
+      "sourceName": "lib/abdk-libraries-solidity/ABDKMath64x64.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ]
+            }
+          },
+          "evmVersion": "london"
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "ABDKMath64x64": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "ABDKMath64x64.sol/ABDKMath64x64.json"
+        }
+      }
+    },
     "/Users/jenshengwong/work/bblanc/binary-ssov/lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
       "lastModificationDate": 1649521256028,
       "contentHash": "611f626b2447ccff9ba5332460fd217f",
@@ -286,8 +320,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1649789341935,
-      "contentHash": "f916fd6b2b461b3ca7eb54554ad92eb8",
+      "lastModificationDate": 1649890442594,
+      "contentHash": "36ee5b1b1db25ed637428cf5da3813d5",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -312,13 +346,13 @@
         }
       },
       "imports": [
+        "lib/abdk-libraries-solidity/ABDKMath64x64.sol",
         "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
         "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
         "lib/openzeppelin-contracts/contracts/utils/Context.sol",
         "lib/solmate/src/tokens/ERC20.sol",
         "lib/solmate/src/utils/SafeTransferLib.sol",
-        "src/WethPriceFeed.sol",
-        "utils/Console.sol"
+        "src/WethPriceFeed.sol"
       ],
       "versionRequirement": "=0.8.10",
       "artifacts": {
@@ -461,6 +495,7 @@
         }
       },
       "imports": [
+        "lib/abdk-libraries-solidity/ABDKMath64x64.sol",
         "lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
         "lib/ds-test/src/test.sol",
         "lib/forge-std/src/Vm.sol",

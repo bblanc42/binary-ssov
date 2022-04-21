@@ -27,6 +27,8 @@ contract Contract is Ownable {
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
     uint256 private depositId = 1;
+    uint256 public bullsAmount = 0;
+    uint256 public bearsAmount = 0;
 
     enum Status {
         EPOCH_START,
@@ -44,9 +46,8 @@ contract Contract is Ownable {
     mapping(uint256 => Bet) public bets;
     mapping(address => bool) public depositorToIsBullish;
     mapping(address => bool) public depositors;
-    mapping(address => uint256) public depositorToAmount;
-    mapping(bool => uint256) public isBullishToAmount;
     mapping(uint256 => address) public idToDepositor;
+    mapping(address => uint256) public depositorToAmount;
 
     function getAssetPrice(address _priceFeed) private view returns (uint256) {
         uint256 price = WethPriceFeed(_priceFeed).peek();
@@ -58,7 +59,11 @@ contract Contract is Ownable {
             address depositor = idToDepositor[i];
             uint256 amount = depositorToAmount[depositor];
             if (amount != 0) {
-                isBullishToAmount[depositorToIsBullish[depositor]] += amount;
+                if (depositorToIsBullish[depositor]) {
+                    bullsAmount += amount;
+                } else {
+                    bearsAmount += amount;
+                }
             }
         }
     }
@@ -94,9 +99,6 @@ contract Contract is Ownable {
         uint256 previousPrice = bet.assetPrice;
         uint256 currentPrice = getAssetPrice(_priceFeed);
 
-        uint256 bullAmount = isBullishToAmount[true];
-        uint256 bearAmount = isBullishToAmount[false];
-
         if (currentPrice >= previousPrice) {
             for (uint256 i = 1; i < depositId; ++i) {
                 address depositor = idToDepositor[i];
@@ -110,11 +112,11 @@ contract Contract is Ownable {
                 } else {
                     int128 previousShare = ABDKMath64x64.divu(
                         amount,
-                        bullAmount
+                        bullsAmount
                     );
                     depositorToAmount[depositor] += ABDKMath64x64.mulu(
                         previousShare,
-                        bearAmount
+                        bearsAmount
                     );
                 }
             }
@@ -132,17 +134,17 @@ contract Contract is Ownable {
                 } else {
                     int128 previousShare = ABDKMath64x64.divu(
                         amount,
-                        bearAmount
+                        bearsAmount
                     );
                     depositorToAmount[depositor] += ABDKMath64x64.mulu(
                         previousShare,
-                        bullAmount
+                        bullsAmount
                     );
                 }
             }
         }
-        isBullishToAmount[false] = 0;
-        isBullishToAmount[true] = 0;
+        bullsAmount = 0;
+        bearsAmount = 0;
         bet.status = Status.EPOCH_END;
         emit EpochSettle();
     }
@@ -166,7 +168,12 @@ contract Contract is Ownable {
 
         depositorToIsBullish[depositor] = isBullish;
         depositorToAmount[depositor] += amount;
-        isBullishToAmount[isBullish] += amount;
+
+        if (isBullish) {
+            bullsAmount += amount;
+        } else {
+            bearsAmount += amount;
+        }
 
         // add new depositor to `depositors`
         if (!depositors[depositor]) {
@@ -197,7 +204,6 @@ contract Contract is Ownable {
         }
 
         depositorToAmount[depositor] = 0;
-        isBullishToAmount[depositorToIsBullish[depositor]] = 0;
 
         SafeTransferLib.safeTransferETH(payable(depositor), amount);
         emit Withdraw(depositor, amount);

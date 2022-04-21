@@ -108,10 +108,10 @@ contract ContractTest is DSTestPlus {
         vm.prank(alice);
         binarySsov.deposit{value: 5 ether}(betIdOne, true);
         binarySsov.closeDeposit(betIdOne);
-        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
+        assertEq(binarySsov.bullsAmount(), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
         assert(binarySsov.depositorToIsBullish(address(alice)));
-        assertEq(binarySsov.isBullishToAmount(false), 0);
+        assertEq(binarySsov.bearsAmount(), 0);
         assertEq(address(binarySsov).balance, 5 ether);
     }
 
@@ -119,10 +119,10 @@ contract ContractTest is DSTestPlus {
         vm.prank(alice);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
         binarySsov.closeDeposit(betIdOne);
-        assertEq(binarySsov.isBullishToAmount(false), 5 ether);
+        assertEq(binarySsov.bearsAmount(), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
         assert(!binarySsov.depositorToIsBullish(address(alice)));
-        assertEq(binarySsov.isBullishToAmount(true), 0);
+        assertEq(binarySsov.bullsAmount(), 0);
         assertEq(address(binarySsov).balance, 5 ether);
     }
 
@@ -134,8 +134,8 @@ contract ContractTest is DSTestPlus {
         vm.prank(cathy);
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
         binarySsov.closeDeposit(betIdOne);
-        assertEq(binarySsov.isBullishToAmount(true), 5 ether);
-        assertEq(binarySsov.isBullishToAmount(false), 10 ether);
+        assertEq(binarySsov.bullsAmount(), 5 ether);
+        assertEq(binarySsov.bearsAmount(), 10 ether);
         assert(binarySsov.depositorToIsBullish(address(alice)));
         assert(!binarySsov.depositorToIsBullish(address(bob)));
         assert(!binarySsov.depositorToIsBullish(address(cathy)));
@@ -207,8 +207,8 @@ contract ContractTest is DSTestPlus {
         (, , uint256 price, ) = binarySsov.bets(betIdTwo);
         assertEq(price, WETH_BULL_PRICE);
 
-        assertEq(binarySsov.isBullishToAmount(true), 15 ether);
-        assertEq(binarySsov.isBullishToAmount(false), 0);
+        assertEq(binarySsov.bullsAmount(), 15 ether);
+        assertEq(binarySsov.bearsAmount(), 0);
 
         // bears (bob and david) deposit 3 and 4 $weth into bear
         vm.prank(bob);
@@ -219,8 +219,8 @@ contract ContractTest is DSTestPlus {
 
         // check contract balance
         assertEq(address(binarySsov).balance, 22 ether);
-        assertEq(binarySsov.isBullishToAmount(true), 15 ether);
-        assertEq(binarySsov.isBullishToAmount(false), 7 ether);
+        assertEq(binarySsov.bullsAmount(), 15 ether);
+        assertEq(binarySsov.bearsAmount(), 7 ether);
 
         // fast forward one week after epoch 1 ends
         vm.warp(14 days + 2);

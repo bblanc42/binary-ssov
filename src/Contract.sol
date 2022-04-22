@@ -46,7 +46,6 @@ contract Contract is Ownable {
     }
 
     mapping(uint256 => Bet) public bets;
-    mapping(address => bool) public depositorToIsBullish;
     mapping(address => bool) public depositors;
     mapping(address => uint256) public depositorToAmount;
 
@@ -154,7 +153,6 @@ contract Contract is Ownable {
         address depositor = msg.sender;
         uint256 amount = msg.value;
 
-        depositorToIsBullish[depositor] = isBullish;
         depositorToAmount[depositor] += amount;
 
         if (isBullish) {

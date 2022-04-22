@@ -110,7 +110,6 @@ contract ContractTest is DSTestPlus {
         binarySsov.closeDeposit(betIdOne);
         assertEq(binarySsov.bullsAmount(), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
-        assert(binarySsov.depositorToIsBullish(address(alice)));
         assertEq(binarySsov.bearsAmount(), 0);
         assertEq(address(binarySsov).balance, 5 ether);
     }
@@ -121,7 +120,6 @@ contract ContractTest is DSTestPlus {
         binarySsov.closeDeposit(betIdOne);
         assertEq(binarySsov.bearsAmount(), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
-        assert(!binarySsov.depositorToIsBullish(address(alice)));
         assertEq(binarySsov.bullsAmount(), 0);
         assertEq(address(binarySsov).balance, 5 ether);
     }
@@ -136,9 +134,6 @@ contract ContractTest is DSTestPlus {
         binarySsov.closeDeposit(betIdOne);
         assertEq(binarySsov.bullsAmount(), 5 ether);
         assertEq(binarySsov.bearsAmount(), 10 ether);
-        assert(binarySsov.depositorToIsBullish(address(alice)));
-        assert(!binarySsov.depositorToIsBullish(address(bob)));
-        assert(!binarySsov.depositorToIsBullish(address(cathy)));
         assertEq(binarySsov.depositorToAmount(address(alice)), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(bob)), 5 ether);
         assertEq(binarySsov.depositorToAmount(address(cathy)), 5 ether);

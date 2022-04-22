@@ -16,7 +16,6 @@ contract Contract is Ownable {
 
     uint256 private constant DURATION = 7 days;
     uint256 private betCounter = 1;
-    uint256 private depositId = 1;
     uint256 public bullsAmount = 0;
     uint256 public bearsAmount = 0;
     address[] bulls;

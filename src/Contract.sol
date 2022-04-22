@@ -142,7 +142,7 @@ contract Contract is Ownable {
         Bet storage bet = bets[betId];
         require(bet.status == Status.EPOCH_START, "Epoch has to start");
         bet.startTime = block.timestamp;
-        bet.startTime = Status.EPOCH_CLOSE;
+        bet.status = Status.EPOCH_CLOSE;
         emit BetClosed(betId);
     }
 

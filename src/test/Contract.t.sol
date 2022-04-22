@@ -77,7 +77,7 @@ contract ContractTest is DSTestPlus {
 
     function testCannotSettleOngoingEpoch() public {
         vm.warp(5 days);
-        vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
+        vm.expectRevert("Epoch is ongoing");
         binarySsov.settleEpoch(betIdOne, address(wethPricefeedSimulator));
     }
 
@@ -91,16 +91,15 @@ contract ContractTest is DSTestPlus {
         assertEq(status, Contract.Status.EPOCH_END);
     }
 
-    function testFailDepositAfterClose() public {
+    function testDepositAfterClose() public {
         binarySsov.closeDeposit(betIdOne);
         vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSignature("EpochMustHaveStarted()"));
+        vm.expectRevert("Deposit period ended");
         binarySsov.deposit(betIdOne, true);
     }
 
     function testFailDepositInsufficientAmount() public {
         vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSignature("InsufficientAmount()"));
         binarySsov.deposit{value: 100 ether}(betIdOne, true);
     }
 
@@ -182,7 +181,7 @@ contract ContractTest is DSTestPlus {
         binarySsov.deposit{value: 5 ether}(betIdOne, false);
         binarySsov.closeDeposit(betIdOne);
         assertEq(address(alice).balance, 5 ether);
-        vm.expectRevert(abi.encodeWithSignature("EpochIsOngoing()"));
+        vm.expectRevert("Epoch has not ended");
         vm.prank(alice);
         binarySsov.withdraw(betIdOne);
         assertEq(address(alice).balance, 5 ether);

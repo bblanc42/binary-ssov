@@ -1,6 +1,6 @@
 #!/bin/sh
 
-forge test -vv
+forge test -vvv
 
 # forge test \
 #     --match-test testFailNonOwnerSettleOngoingEpoch \

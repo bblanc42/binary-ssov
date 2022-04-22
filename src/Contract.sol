@@ -7,17 +7,7 @@ import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "./WethPriceFeed.sol";
 
-// contract to create ETH binary SSOV
-// Will the price of $ETH be > $3,500 on Friday?
 contract Contract is Ownable {
-    error EpochClosed();
-    error EpochIsOngoing();
-    error EpochMustHaveStarted();
-    error FailToDeposit();
-    error InsufficientAmount();
-    error Unauthorized();
-    error NothingToWithdraw();
-
     event BetCreated(Bet bet);
     event BetClosed(uint256 betId);
     event Deposit(address indexed depositor, uint256 amount, bool isBullish);
@@ -87,9 +77,7 @@ contract Contract is Ownable {
         uint256 currentTime = block.timestamp;
         uint256 startTime = bet.startTime;
 
-        if (startTime + DURATION > currentTime) {
-            revert EpochIsOngoing();
-        }
+        require(startTime + DURATION <= currentTime, "Epoch is ongoing");
 
         uint256 previousPrice = bet.assetPrice;
         uint256 currentPrice = getAssetPrice(_priceFeed);
@@ -138,17 +126,16 @@ contract Contract is Ownable {
 
     function closeDeposit(uint256 betId) external onlyOwner {
         Bet storage bet = bets[betId];
-        if (bet.status != Status.EPOCH_START) {
-            revert EpochMustHaveStarted();
-        }
+        require(bet.status == Status.EPOCH_START, "Epoch has to start");
         bet.status = Status.EPOCH_CLOSE;
         emit BetClosed(betId);
     }
 
     function deposit(uint256 betId, bool isBullish) external payable {
-        if (bets[betId].status == Status.EPOCH_CLOSE) {
-            revert EpochClosed();
-        }
+        require(
+            bets[betId].status == Status.EPOCH_START,
+            "Deposit period ended"
+        );
 
         address depositor = msg.sender;
         uint256 amount = msg.value;
@@ -164,25 +151,18 @@ contract Contract is Ownable {
         }
 
         (bool success, ) = payable(address(this)).call{value: amount}("");
-
-        if (!success) {
-            revert FailToDeposit();
-        }
+        require(success, "Fail to deposit");
 
         emit Deposit(depositor, amount, isBullish);
     }
 
     function withdraw(uint256 betId) external {
-        if (bets[betId].status != Status.EPOCH_END) {
-            revert EpochIsOngoing();
-        }
+        require(bets[betId].status == Status.EPOCH_END, "Epoch has not ended");
 
         address depositor = msg.sender;
         uint256 amount = depositorToAmount[depositor];
 
-        if (amount == 0) {
-            revert NothingToWithdraw();
-        }
+        require(amount != 0, "Nothing to withdraw");
 
         depositorToAmount[depositor] = 0;
 

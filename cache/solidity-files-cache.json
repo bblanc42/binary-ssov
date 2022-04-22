@@ -320,8 +320,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/Contract.sol": {
-      "lastModificationDate": 1650596295438,
-      "contentHash": "cca4447e4aea691ddd80e57bb7b0bac2",
+      "lastModificationDate": 1650597759129,
+      "contentHash": "4e91e1ebf8fc741ddc05627ed7f19db9",
       "sourceName": "src/Contract.sol",
       "solcConfig": {
         "settings": {
@@ -469,8 +469,8 @@
       }
     },
     "/Users/jenshengwong/work/bblanc/binary-ssov/src/test/Contract.t.sol": {
-      "lastModificationDate": 1650596343290,
-      "contentHash": "d796aea2d901bcd5ff122d0a7fba5925",
+      "lastModificationDate": 1650597855358,
+      "contentHash": "13bbc5716258936dcbb726f8adf3837e",
       "sourceName": "src/test/Contract.t.sol",
       "solcConfig": {
         "settings": {

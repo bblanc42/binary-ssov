@@ -29,6 +29,8 @@ contract Contract is Ownable {
     uint256 private depositId = 1;
     uint256 public bullsAmount = 0;
     uint256 public bearsAmount = 0;
+    address[] bulls;
+    address[] bears;
 
     enum Status {
         EPOCH_START,
@@ -46,7 +48,6 @@ contract Contract is Ownable {
     mapping(uint256 => Bet) public bets;
     mapping(address => bool) public depositorToIsBullish;
     mapping(address => bool) public depositors;
-    mapping(uint256 => address) public idToDepositor;
     mapping(address => uint256) public depositorToAmount;
 
     function getAssetPrice(address _priceFeed) private view returns (uint256) {
@@ -55,16 +56,11 @@ contract Contract is Ownable {
     }
 
     function rollover() private {
-        for (uint256 i = 1; i < depositId; ++i) {
-            address depositor = idToDepositor[i];
-            uint256 amount = depositorToAmount[depositor];
-            if (amount != 0) {
-                if (depositorToIsBullish[depositor]) {
-                    bullsAmount += amount;
-                } else {
-                    bearsAmount += amount;
-                }
-            }
+        for (uint256 i = 0; i < bulls.length; ++i) {
+            bullsAmount += depositorToAmount[bulls[i]];
+        }
+        for (uint256 i = 0; i < bears.length; ++i) {
+            bearsAmount += depositorToAmount[bears[i]];
         }
     }
 
@@ -99,49 +95,41 @@ contract Contract is Ownable {
         uint256 previousPrice = bet.assetPrice;
         uint256 currentPrice = getAssetPrice(_priceFeed);
 
+        // bulls win
         if (currentPrice >= previousPrice) {
-            for (uint256 i = 1; i < depositId; ++i) {
-                address depositor = idToDepositor[i];
+            // calculate how much of share of the deposit by bears
+            // should be distributed to the bulls
+            for (uint256 i = 0; i < bulls.length; ++i) {
+                address depositor = bulls[i];
                 uint256 amount = depositorToAmount[depositor];
-                if (amount == 0) {
-                    continue;
-                }
-
-                if (!depositorToIsBullish[depositor]) {
-                    depositorToAmount[depositor] = 0;
-                } else {
-                    int128 previousShare = ABDKMath64x64.divu(
-                        amount,
-                        bullsAmount
-                    );
-                    depositorToAmount[depositor] += ABDKMath64x64.mulu(
-                        previousShare,
-                        bearsAmount
-                    );
-                }
+                int128 previousShare = ABDKMath64x64.divu(amount, bullsAmount);
+                depositorToAmount[depositor] += ABDKMath64x64.mulu(
+                    previousShare,
+                    bearsAmount
+                );
             }
+            // set bears' balance to 0
+            for (uint256 i = 0; i < bears.length; ++i) {
+                depositorToAmount[bears[i]] = 0;
+            }
+            delete bears;
         } else {
-            for (uint256 i = 1; i < depositId; ++i) {
-                address depositor = idToDepositor[i];
+            // calculate how much of share of the deposit by bulls
+            // should be distributed to the bears
+            for (uint256 i = 0; i < bears.length; ++i) {
+                address depositor = bears[i];
                 uint256 amount = depositorToAmount[depositor];
-                if (amount == 0) {
-                    continue;
-                }
-
-                // bullish depositor's balance -> 0
-                if (depositorToIsBullish[depositor]) {
-                    depositorToAmount[depositor] = 0;
-                } else {
-                    int128 previousShare = ABDKMath64x64.divu(
-                        amount,
-                        bearsAmount
-                    );
-                    depositorToAmount[depositor] += ABDKMath64x64.mulu(
-                        previousShare,
-                        bullsAmount
-                    );
-                }
+                int128 previousShare = ABDKMath64x64.divu(amount, bearsAmount);
+                depositorToAmount[depositor] += ABDKMath64x64.mulu(
+                    previousShare,
+                    bullsAmount
+                );
             }
+            // set bulls' balance to 0
+            for (uint256 i = 0; i < bulls.length; ++i) {
+                depositorToAmount[bulls[i]] = 0;
+            }
+            delete bulls;
         }
         bullsAmount = 0;
         bearsAmount = 0;
@@ -171,15 +159,10 @@ contract Contract is Ownable {
 
         if (isBullish) {
             bullsAmount += amount;
+            bulls.push(depositor);
         } else {
             bearsAmount += amount;
-        }
-
-        // add new depositor to `depositors`
-        if (!depositors[depositor]) {
-            depositors[depositor] = true;
-            idToDepositor[depositId] = depositor;
-            depositId++;
+            bears.push(depositor);
         }
 
         (bool success, ) = payable(address(this)).call{value: amount}("");

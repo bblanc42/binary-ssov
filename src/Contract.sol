@@ -31,7 +31,6 @@ contract Contract is Ownable {
     address[] bulls;
     address[] bears;
     mapping(uint256 => Bet) public bets;
-    mapping(address => bool) public depositors;
     mapping(address => uint256) public depositorToAmount;
 
     /// ============ Structs ============

@@ -7,26 +7,34 @@ import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "./WethPriceFeed.sol";
 
+/// @notice Binary SSOV that allows users to bet on the price of WETH
 contract Contract is Ownable {
-    event BetCreated(Bet bet);
-    event BetClosed(uint256 betId);
-    event Deposit(address indexed depositor, uint256 amount, bool isBullish);
-    event Withdraw(address indexed depositor, uint256 amount);
-    event EpochSettle();
-
+    /// ============ Constants ============
     uint256 private constant DURATION = 7 days;
-    uint256 private betCounter = 1;
-    uint256 public bullsAmount = 0;
-    uint256 public bearsAmount = 0;
-    address[] bulls;
-    address[] bears;
-
     enum Status {
         EPOCH_START,
         EPOCH_CLOSE,
         EPOCH_END
     }
 
+    /// ============ Events ============
+    event BetCreated(Bet bet);
+    event BetClosed(uint256 betId);
+    event Deposit(address indexed depositor, uint256 amount, bool isBullish);
+    event Withdraw(address indexed depositor, uint256 amount);
+    event EpochSettle();
+
+    /// ============ Mutable storage ============
+    uint256 private betCounter = 1;
+    uint256 public bullsAmount = 0;
+    uint256 public bearsAmount = 0;
+    address[] bulls;
+    address[] bears;
+    mapping(uint256 => Bet) public bets;
+    mapping(address => bool) public depositors;
+    mapping(address => uint256) public depositorToAmount;
+
+    /// ============ Structs ============
     struct Bet {
         uint256 betId;
         uint256 startTime;
@@ -34,15 +42,14 @@ contract Contract is Ownable {
         Status status;
     }
 
-    mapping(uint256 => Bet) public bets;
-    mapping(address => bool) public depositors;
-    mapping(address => uint256) public depositorToAmount;
-
+    /// @notice Get price of WETH
+    /// @param _priceFeed Address of price feed
     function getAssetPrice(address _priceFeed) private view returns (uint256) {
         uint256 price = WethPriceFeed(_priceFeed).peek();
         return price;
     }
 
+    /// @notice Rollover the bets from previous epoch if user did not withdraw
     function rollover() private {
         for (uint256 i = 0; i < bulls.length; ++i) {
             bullsAmount += depositorToAmount[bulls[i]];
@@ -52,6 +59,8 @@ contract Contract is Ownable {
         }
     }
 
+    /// @notice Create a bet and capture the price of WETH
+    /// @param _priceFeed Address of price feed
     function createBet(address _priceFeed)
         external
         onlyOwner
@@ -59,7 +68,7 @@ contract Contract is Ownable {
     {
         Bet memory bet = Bet({
             betId: betCounter,
-            startTime: block.timestamp,
+            startTime: 0,
             assetPrice: getAssetPrice(_priceFeed),
             status: Status.EPOCH_START
         });
@@ -70,6 +79,10 @@ contract Contract is Ownable {
         return bet.betId;
     }
 
+    /// @notice Settle an epoch after it has ended after a week from
+    /// 		the started of the epoch / closeDeposit is triggered
+    /// @param betId ID of bet
+    /// @param _priceFeed Address of price feed
     function settleEpoch(uint256 betId, address _priceFeed) external onlyOwner {
         Bet storage bet = bets[betId];
 
@@ -123,13 +136,19 @@ contract Contract is Ownable {
         emit EpochSettle();
     }
 
+    /// @notice Close a deposit after users have deposited
+    /// @param betId ID of bet
     function closeDeposit(uint256 betId) external onlyOwner {
         Bet storage bet = bets[betId];
         require(bet.status == Status.EPOCH_START, "Epoch has to start");
-        bet.status = Status.EPOCH_CLOSE;
+        bet.startTime = block.timestamp;
+        bet.startTime = Status.EPOCH_CLOSE;
         emit BetClosed(betId);
     }
 
+    /// @notice Users call this to deposit into bullish of bearish vault
+    /// @param betId ID of bet
+    /// @param isBullish Is depositor bullish or bearish?
     function deposit(uint256 betId, bool isBullish) external payable {
         require(
             bets[betId].status == Status.EPOCH_START,
@@ -155,6 +174,8 @@ contract Contract is Ownable {
         emit Deposit(depositor, amount, isBullish);
     }
 
+    /// @notice Users call this to withdraw their deposit
+    /// @param betId ID of bet
     function withdraw(uint256 betId) external {
         require(bets[betId].status == Status.EPOCH_END, "Epoch has not ended");
 
